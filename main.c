@@ -65,11 +65,12 @@ void iniciarDescritor(descritorRodovias **descritor, char *rodovia, char *cidade
         return;
     }
 
-    iniciarRodovia(descritor, rodovia, cidade, estado, km);
-
     (*descritor)->inicio = addRodovia;
     (*descritor)->final = addRodovia;
     (*descritor)->quantRodovias = 1;
+    
+    iniciarRodovia(descritor, rodovia, cidade, estado, km);
+
 }
 
 void adicionarRodovia(descritorRodovias **descritor, char *rodovia, char *cidade, char *estado, float km) {
