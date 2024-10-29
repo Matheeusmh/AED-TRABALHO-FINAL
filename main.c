@@ -25,6 +25,16 @@ typedef struct {
 typedef NoCidades *novaCidade;
 typedef NoRodovias *novaRodovia;
 
+void iniciarCidade(descritorRodovias **descritor, char *rodovia, char *cidade, char *estado, float km) {
+    novaCidade auxCidade = (*descritor)->inicio->cidades;
+    
+    strcpy(auxCidade->cidade, cidade);
+    strcpy(auxCidade->estado, estado);
+    auxCidade->km = km;
+    auxCidade->prox = NULL;
+    auxCidade->ant = NULL;
+}
+
 void iniciarRodovia(descritorRodovias **descritor, char *rodovia, char *cidade, char *estado, float km) {
     novaRodovia auxRodovia = (*descritor)->inicio;
     auxRodovia = (NoRodovias *)malloc(sizeof(NoRodovias));
@@ -34,7 +44,7 @@ void iniciarRodovia(descritorRodovias **descritor, char *rodovia, char *cidade, 
     }
 
     strcpy(auxRodovia->rodovia, rodovia);
-    
+
     novaCidade addCidade;
     addCidade = (NoCidades *)malloc(sizeof(NoCidades));
     if(addCidade == NULL) {
@@ -42,14 +52,10 @@ void iniciarRodovia(descritorRodovias **descritor, char *rodovia, char *cidade, 
         return;
     }
 
-    strcpy(addCidade->cidade, cidade);
-    strcpy(addCidade->estado, estado);
-    addCidade->km = km;
-    addCidade->prox = NULL;
-    addCidade->ant = NULL;
-
     auxRodovia->cidades = cidade;
     auxRodovia->prox = NULL;
+
+    iniciarCidade(descritor, rodovia, cidade, estado, km);
 }
 
 void iniciarDescritor(descritorRodovias **descritor, char *rodovia, char *cidade, char *estado, float km) {
@@ -68,9 +74,8 @@ void iniciarDescritor(descritorRodovias **descritor, char *rodovia, char *cidade
     (*descritor)->inicio = addRodovia;
     (*descritor)->final = addRodovia;
     (*descritor)->quantRodovias = 1;
-    
-    iniciarRodovia(descritor, rodovia, cidade, estado, km);
 
+    iniciarRodovia(descritor, rodovia, cidade, estado, km);
 }
 
 void adicionarRodovia(descritorRodovias **descritor, char *rodovia, char *cidade, char *estado, float km) {
@@ -91,7 +96,6 @@ void lerArquivo(descritorRodovias **descritor) {
     }
 
     else {
-
         while(fscanf(ptrArquivo, "%8s", rodovia) != EOF) {
             fscanf(ptrArquivo, "%20s", cidade);
             fscanf(ptrArquivo, "%2s", estado);
