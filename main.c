@@ -34,7 +34,6 @@ void iniciarCidade(descritorRodovias **descritor, char *rodovia, char *cidade, c
     auxCidade->prox = NULL;
     auxCidade->ant = NULL;
 }
-
 void iniciarRodovia(descritorRodovias **descritor, char *rodovia, char *cidade, char *estado, float km) {
     novaRodovia auxRodovia = (*descritor)->inicio;
     auxRodovia = (NoRodovias *)malloc(sizeof(NoRodovias));
