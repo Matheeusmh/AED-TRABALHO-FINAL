@@ -72,11 +72,60 @@ void iniciarDescritor(descritorRodovias **descritor, char *rodovia, char *cidade
     (*descritor)->quantRodovias = 1;
 }
 
+void adicionarCidade(NoRodovias **ptrRodovia, char *rodovia, char *cidade, char *estado, float km) {
+    novaCidade addCidade;
+    addCidade = (NoCidades *)malloc(sizeof(NoCidades));
+    if(addCidade == NULL) {
+        printf("Erro ao alocar memoria!\n");
+        return;
+    }
+
+    strcpy(addCidade->cidade, cidade);
+    strcpy(addCidade->estado, estado);
+    addCidade->km = km;
+
+    novaCidade auxCidade = (*ptrRodovia)->cidades;
+
+    while(auxCidade->km <= addCidade->km) {
+        auxCidade = auxCidade->prox;
+    }
+
+    auxCidade->ant->prox = addCidade;
+    addCidade->ant = auxCidade->ant;
+
+    addCidade->prox = auxCidade;
+    auxCidade->ant = addCidade;
+
+}
 void adicionarRodovia(descritorRodovias **descritor, char *rodovia, char *cidade, char *estado, float km) {
     if(*descritor == NULL) {
         iniciarDescritor(descritor, rodovia, cidade, estado, km);
     }
+
+    novaRodovia auxRodovia = (*descritor)->inicio;
+
+    while(auxRodovia != NULL) {
+        if(strcmp(auxRodovia->rodovia, rodovia) == 0) {
+            adicionarCidade(&auxRodovia, rodovia, cidade, estado, km);
+            return;
+        }
+    }
+
+    novaRodovia addRodovia;
+    addRodovia = (NoRodovias *)malloc(sizeof(NoRodovias));
+    if(addRodovia == NULL) {
+        printf("Erro ao alocar memoria!\n");
+        return;
+    }
+
+    (*descritor)->final->prox = addRodovia;
+    (*descritor)->final = addRodovia;
+
+    iniciarRodovia(descritor, rodovia, cidade, estado, km);
+
 }
+
+
 
 void lerArquivo(descritorRodovias **descritor) {
     FILE *ptrArquivo;
@@ -96,7 +145,7 @@ void lerArquivo(descritorRodovias **descritor) {
             fscanf(ptrArquivo, "%2s", estado);
             fscanf(ptrArquivo, "%f", km);
 
-            inserirRodovia(descritor, rodovia, cidade, estado, km);
+            adicionarRodovia(descritor, rodovia, cidade, estado, km);
         }
 
         fclose(ptrArquivo);
