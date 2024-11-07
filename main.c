@@ -25,54 +25,16 @@ typedef struct {
 typedef NoCidades *novaCidade;
 typedef NoRodovias *novaRodovia;
 
-void iniciarRodovia(descritorRodovias **descritor, char *rodovia, char *cidade, char *estado, float km) {
-    novaRodovia auxRodovia = (*descritor)->inicio;
-    auxRodovia = (NoRodovias *)malloc(sizeof(NoRodovias));
-    if(auxRodovia == NULL) {
+NoCidades *iniciarCidades() {
+    NoCidades *novo;
+    novo = (NoCidades *)malloc(sizeof(NoCidades));
+    if(novo == NULL) {
         printf("Erro ao alocar memoria!\n");
-        return;
+        return NULL;
     }
-
-    strcpy(auxRodovia->rodovia, rodovia);
-    
-    novaCidade addCidade;
-    addCidade = (NoCidades *)malloc(sizeof(NoCidades));
-    if(addCidade == NULL) {
-        printf("Erro ao alocar memoria!\n");
-        return;
-    }
-
-    strcpy(addCidade->cidade, cidade);
-    strcpy(addCidade->estado, estado);
-    addCidade->km = km;
-    addCidade->prox = NULL;
-    addCidade->ant = NULL;
-
-    auxRodovia->cidades = cidade;
-    auxRodovia->prox = NULL;
 }
 
-void iniciarDescritor(descritorRodovias **descritor, char *rodovia, char *cidade, char *estado, float km) {
-    (*descritor) = (descritorRodovias *)malloc(sizeof(descritorRodovias));
-    if(*descritor == NULL) {
-        printf("Erro ao alocar memoria!\n");
-        return;
-    }
-
-    novaRodovia addRodovia = (NoRodovias *)malloc(sizeof(NoRodovias));
-    if(addRodovia == NULL) {
-        printf("Erro ao alocar memoria!\n");
-        return;
-    }
-
-    iniciarRodovia(descritor, rodovia, cidade, estado, km);
-
-    (*descritor)->inicio = addRodovia;
-    (*descritor)->final = addRodovia;
-    (*descritor)->quantRodovias = 1;
-}
-
-void adicionarCidade(NoRodovias **ptrRodovia, char *rodovia, char *cidade, char *estado, float km) {
+void adicionarCidade(NoRodovias *ptrRodovia, char *cidade, char *estado, float km) {
     novaCidade addCidade;
     addCidade = (NoCidades *)malloc(sizeof(NoCidades));
     if(addCidade == NULL) {
@@ -97,12 +59,17 @@ void adicionarCidade(NoRodovias **ptrRodovia, char *rodovia, char *cidade, char 
     auxCidade->ant = addCidade;
 
 }
-void adicionarRodovia(descritorRodovias **descritor, char *rodovia, char *cidade, char *estado, float km) {
-    if(*descritor == NULL) {
-        iniciarDescritor(descritor, rodovia, cidade, estado, km);
+
+void adicionarRodovia(descritorRodovias *descritor, char *rodovia, char *cidade, char *estado, float km) {
+    novaRodovia nova;
+    nova = (NoRodovias *)malloc(sizeof(NoRodovias));
+    if(nova == NULL) {
+        printf("Erro ao alocar memoria!\n");
+        return;
     }
 
-    novaRodovia auxRodovia = (*descritor)->inicio;
+    strcpy(nova->rodovia, rodovia);
+    nova->cidades = iniciarCidades();
 
     while(auxRodovia != NULL) {
         if(strcmp(auxRodovia->rodovia, rodovia) == 0) {
