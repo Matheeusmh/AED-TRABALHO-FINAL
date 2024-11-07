@@ -98,6 +98,12 @@ void adicionarCidade(descritorCidades *cidades, char *cidade, char *estado, floa
         return;
     }
 
+    strcpy(addCidade->cidade, cidade);
+    strcpy(addCidade->estado, estado);
+    addCidade->km = km;
+    addCidade->prox = NULL;
+    addCidade->ant = NULL;
+
     if(cidades->inicio == NULL) {
         cidades->inicio = addCidade;
         cidades->final = addCidade;
@@ -182,6 +188,7 @@ void lerArquivo(descritorRodovias **descritor) {
     }
 
     else {
+
         while(fscanf(ptrArquivo, "%8s", rodovia) != EOF) {
             fscanf(ptrArquivo, "%20s", cidade);
             fscanf(ptrArquivo, "%2s", estado);
