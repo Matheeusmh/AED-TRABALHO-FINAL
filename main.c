@@ -451,6 +451,7 @@ void menu(descritorRodovias *rodovias) {
         printf("3 - Remover Rodovia\n");
         printf("4 - Traçar Percurso\n");
         printf("5 - Cruzamento entre rodovias\n");
+        printf("6 - Imprimir cidades\n");
         printf("0 - Sair\n");
         printf("Opção: ");
         scanf("%d", &escolha);
