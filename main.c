@@ -2,35 +2,41 @@
 #include <stdlib.h>
 #include <string.h>
 
+// Definição da estrutura que representa uma cidade
 typedef struct noCidades {
-    char cidade[20];
-    char estado[2];
-    float km;
-    struct noCidades *prox;
-    struct noCidades *ant;
+    char cidade[20]; // Nome da cidade
+    char estado[2]; // Sigla do estado
+    float km; // Distância em km
+    struct noCidades *prox; // Ponteiro para a próxima cidade
+    struct noCidades *ant; // Ponteiro para a cidade anterior
 } NoCidades;
 
-typedef struct noRodovias{
-    char rodovia[8];
-    descritorCidades *cidades;
-    struct noRodovias *prox;
+// Definição da estrutura que representa uma rodovia
+typedef struct noRodovias {
+    char rodovia[8]; // Nome da rodovia
+    descritorCidades *cidades; // Lista de cidades associadas à rodovia
+    struct noRodovias *prox; // Ponteiro para a próxima rodovia
 } NoRodovias;
 
+// Estrutura que descreve uma lista de rodovias
 typedef struct {
-    NoRodovias *inicio;
-    NoRodovias *final;
-    int quantRodovias;
+    NoRodovias *inicio; // Ponteiro para o início da lista
+    NoRodovias *final; // Ponteiro para o final da lista
+    int quantRodovias; // Quantidade de rodovias
 } descritorRodovias;
 
+// Estrutura que descreve uma lista de cidades
 typedef struct {
-    NoCidades *inicio;
-    NoCidades *final;
-    int quantCidades;
+    NoCidades *inicio; // Ponteiro para o início da lista
+    NoCidades *final; // Ponteiro para o final da lista
+    int quantCidades; // Quantidade de cidades
 } descritorCidades;
 
+// Tipos para facilitar o uso dos ponteiros de cidades e rodovias
 typedef NoCidades *novaCidade;
 typedef NoRodovias *novaRodovia;
 
+// Função que converte uma string para letras maiúsculas
 char *stringToUpr(char *stringOrig) {
     char *stringCpy;
     stringCpy = (char *)malloc((strlen(stringOrig) + 1) * sizeof(char));
@@ -41,6 +47,7 @@ char *stringToUpr(char *stringOrig) {
 
     strcpy(stringCpy, stringOrig);
 
+    // Converte cada caractere para maiúscula
     for(int i = 0; stringCpy[i] != '\0'; i++) {
         stringCpy[i] = toupper(stringCpy[i]);
     }
@@ -48,6 +55,7 @@ char *stringToUpr(char *stringOrig) {
     return stringCpy;
 }
 
+// Função que inicializa o descritor de cidades
 descritorCidades *iniciarCidades() {
     descritorCidades *novo;
     novo = (descritorCidades *)malloc(sizeof(descritorCidades));
@@ -62,6 +70,7 @@ descritorCidades *iniciarCidades() {
     return novo;
 }
 
+// Função que inicializa o descritor de rodovias
 descritorRodovias *iniciarRodovias() {
     descritorRodovias *novo;
     novo = (descritorRodovias *)malloc(sizeof(descritorRodovias));
@@ -77,6 +86,7 @@ descritorRodovias *iniciarRodovias() {
     return novo;
 }
 
+// Função que verifica se uma cidade já existe na lista de cidades
 int verificadorCidade(descritorCidades *cidades, char *cidade) {
     novaCidade aux = cidades->inicio;
 
@@ -88,6 +98,7 @@ int verificadorCidade(descritorCidades *cidades, char *cidade) {
     return 0;
 }
 
+// Função para adicionar uma cidade na lista, ordenando pela distância em km
 void adicionarCidade(descritorCidades *cidades, char *cidade, char *estado, float km) {
     if(verificadorCidade(cidades, cidade)) {
         return;
@@ -135,6 +146,7 @@ void adicionarCidade(descritorCidades *cidades, char *cidade, char *estado, floa
     cidades->quantCidades++;
 }
 
+// Função que verifica se uma rodovia existe, retornando a lista de cidades associada
 descritorCidades *verificadorRodovia(descritorRodovias *descritor, char *rodovia) {
     novaRodovia aux = descritor->inicio;
     while(aux != NULL) {
@@ -147,6 +159,7 @@ descritorCidades *verificadorRodovia(descritorRodovias *descritor, char *rodovia
     return NULL;
 }
 
+// Função para adicionar uma rodovia e associar uma cidade a ela
 void adicionarRodovia(descritorRodovias *descritor, char *rodovia, char *cidade, char *estado, float km) {
     descritorCidades *verificaRodovia = verificadorRodovia(descritor, rodovia);
     if(verificaRodovia != NULL) {
@@ -182,8 +195,7 @@ void adicionarRodovia(descritorRodovias *descritor, char *rodovia, char *cidade,
     descritor->quantRodovias++;
 }
 
-
-
+// Função para ler dados de um arquivo e preencher a lista de rodovias e cidades
 void lerArquivo(descritorRodovias **descritor) {
     FILE *ptrArquivo;
     char rodovia[8], cidade[20], estado[2];
@@ -197,9 +209,9 @@ void lerArquivo(descritorRodovias **descritor) {
 
     else {
 
-        while(fscanf(ptrArquivo, "%8s", rodovia) != EOF) {
-            fscanf(ptrArquivo, "%20s", cidade);
+        while(fscanf(ptrArquivo, "%20s", cidade) != EOF) {
             fscanf(ptrArquivo, "%2s", estado);
+            fscanf(ptrArquivo, "%8s", rodovia);
             fscanf(ptrArquivo, "%f", &km);
 
             adicionarRodovia(descritor, rodovia, cidade, estado, km);
@@ -208,7 +220,6 @@ void lerArquivo(descritorRodovias **descritor) {
         fclose(ptrArquivo);
     }
 }
-//O meu eh para cima
 
 int removerRodovia(descritorRodovias *descritor, char *rodovia){
     if (descritor == NULL || descritor->inicio == NULL){ // Verificação para ver se é válido o descritor de rodovias ou se a lista está vazia ou não.
