@@ -82,6 +82,7 @@ int verificadorCidade(descritorCidades *cidades, char *cidade) {
 
     while(aux != NULL) {
         if(strcmp(stringToUpr(aux->cidade), stringToUpr(cidade)) == 0) return 1;
+        aux = aux->prox;
     }
 
     return 0;
@@ -111,19 +112,22 @@ void adicionarCidade(descritorCidades *cidades, char *cidade, char *estado, floa
     else {
         novaCidade aux = cidades->inicio;
 
-        while(km >= aux->km && aux != NULL) {
+        while(aux != NULL && km >= aux->km) {
             aux = aux->prox;
         }
 
         addCidade->prox = aux;
-        aux->ant->prox = addCidade;
+        if (aux->ant != NULL) {
+            aux->ant->prox = addCidade;
+        }
+
         addCidade->ant = aux->ant;
         aux->ant = addCidade;
 
         if(aux == NULL) {
             cidades->final = addCidade;
         }
-        else if(aux->ant = NULL) {
+        else if(aux->ant == NULL) {
             cidades->inicio = addCidade;
         }
     }
@@ -134,15 +138,19 @@ void adicionarCidade(descritorCidades *cidades, char *cidade, char *estado, floa
 descritorCidades *verificadorRodovia(descritorRodovias *descritor, char *rodovia) {
     novaRodovia aux = descritor->inicio;
     while(aux != NULL) {
-        if(strcmp(stringToUpr(aux->rodovia), stringToUpr(rodovia)) == 0) aux->cidades;
+        if(strcmp(stringToUpr(aux->rodovia), stringToUpr(rodovia)) == 0) {
+            return aux->cidades;
+        }
+        aux = aux->prox;
     }
 
     return NULL;
 }
 
 void adicionarRodovia(descritorRodovias *descritor, char *rodovia, char *cidade, char *estado, float km) {
-    if(verificadorRodovia(descritor, rodovia) != NULL) {
-        adicionarCidade(verificadorRodovia(descritor, rodovia), cidade, estado, km);
+    descritorCidades *verificaRodovia = verificadorRodovia(descritor, rodovia);
+    if(verificaRodovia != NULL) {
+        adicionarCidade(verificaRodovia, cidade, estado, km);
         return;
     }
 
@@ -192,7 +200,7 @@ void lerArquivo(descritorRodovias **descritor) {
         while(fscanf(ptrArquivo, "%8s", rodovia) != EOF) {
             fscanf(ptrArquivo, "%20s", cidade);
             fscanf(ptrArquivo, "%2s", estado);
-            fscanf(ptrArquivo, "%f", km);
+            fscanf(ptrArquivo, "%f", &km);
 
             adicionarRodovia(descritor, rodovia, cidade, estado, km);
         }
@@ -200,6 +208,7 @@ void lerArquivo(descritorRodovias **descritor) {
         fclose(ptrArquivo);
     }
 }
+//O meu eh para cima
 
 int removerRodovia(descritorRodovias *descritor, char *rodovia){
     if (descritor == NULL || descritor->inicio == NULL){ // Verificação para ver se é válido o descritor de rodovias ou se a lista está vazia ou não.
