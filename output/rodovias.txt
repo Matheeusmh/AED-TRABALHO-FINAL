@@ -1,7 +1,7 @@
-Fortaleza
+Ico
 CE
 BR116
-0
+359
 Touros
 RN
 BR101
@@ -22,10 +22,6 @@ Cuiaba
 MT
 BR364
 1372
-Ico
-CE
-BR116
-359
 Recife
 PE
 BR101
@@ -54,6 +50,10 @@ Sao Jose do Norte
 RS
 BR101
 4379
+Fortaleza
+CE
+BR116
+0
 Mancio Lima
 RO
 BR364
@@ -70,7 +70,7 @@ Belo Horizonte
 MG
 BR040
 738
-Petrópolis
+Petropolis
 RJ
 BR040
 1109
@@ -86,7 +86,7 @@ Porto Alegre
 RS
 BR290
 104
-São Gabriel
+Sao Gabriel
 RS
 BR290
 420
@@ -98,7 +98,7 @@ Uruguaiana
 RS
 BR290
 726
-Marabá
+Maraba
 PA
 BR153
 0

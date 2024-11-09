@@ -5,8 +5,8 @@
 
 // Definição da estrutura que representa uma cidade
 typedef struct noCidades {
-    char cidade[22]; // Nome da cidade
-    char estado[3]; // Sigla do estado
+    char cidade[20]; // Nome da cidade
+    char estado[2]; // Sigla do estado
     float km; // Distância em km
     struct noCidades *prox; // Ponteiro para a próxima cidade
     struct noCidades *ant; // Ponteiro para a cidade anterior
@@ -33,22 +33,31 @@ typedef struct {
     int quantRodovias; // Quantidade de rodovias
 } descritorRodovias;
 
+
+
 // Tipos para facilitar o uso dos ponteiros de cidades e rodovias
 typedef NoCidades *novaCidade;
 typedef NoRodovias *novaRodovia;
 
-// Função que converte uma string para letras minuscula
-void to_lowercase(char *str) {
-    if (str == NULL) return;
-    int i = 0;
-    while (str[i]) {
-
-        if (isupper(str[i])) {
-            str[i] = str[i] + 32;
-        }
-        i++;
+// Função que converte uma string para letras maiúsculas
+char *stringToUpr(char *stringOrig) {
+    char *stringCpy;
+    stringCpy = (char *)malloc((strlen(stringOrig) + 1) * sizeof(char));
+    if(stringCpy == NULL) {
+        printf("Erro ao alocar memoria!\n");
+        return NULL;
     }
+
+    strcpy(stringCpy, stringOrig);
+
+    // Converte cada caractere para maiúscula
+    for(int i = 0; stringCpy[i] != '\0'; i++) {
+        stringCpy[i] = toupper(stringCpy[i]);
+    }
+
+    return stringCpy;
 }
+
 // Função que inicializa o descritor de cidades
 descritorCidades *iniciarCidades() {
     descritorCidades *novo;
@@ -60,7 +69,6 @@ descritorCidades *iniciarCidades() {
 
     novo->inicio = NULL;
     novo->final = NULL;
-    novo->quantCidades = 0;
 
     return novo;
 }
@@ -86,7 +94,7 @@ int verificadorCidade(descritorCidades *cidades, char *cidade) {
     novaCidade aux = cidades->inicio;
 
     while(aux != NULL) {
-        if(strcmp(aux->cidade, cidade) == 0) return 1;
+        if(strcmp(stringToUpr(aux->cidade), stringToUpr(cidade)) == 0) return 1;
         aux = aux->prox;
     }
 
@@ -95,51 +103,46 @@ int verificadorCidade(descritorCidades *cidades, char *cidade) {
 
 // Função para adicionar uma cidade na lista, ordenando pela distância em km
 void adicionarCidade(descritorCidades *cidades, char *cidade, char *estado, float km) {
-    if (verificadorCidade(cidades, cidade)) {
-        return; // Se a cidade já existir, não faz nada.
+    if(verificadorCidade(cidades, cidade)) {
+        return;
     }
-
-    NoCidades *addCidade = (NoCidades *)malloc(sizeof(NoCidades));
-    if (addCidade == NULL) {
-        printf("Erro ao alocar memória!\n");
+    novaCidade addCidade;
+    addCidade = (NoCidades *)malloc(sizeof(NoCidades));
+    if(addCidade == NULL) {
+        printf("Erro ao alocar memoria!\n");
         return;
     }
 
-    // Inicializa os valores do novo nó
     strcpy(addCidade->cidade, cidade);
     strcpy(addCidade->estado, estado);
     addCidade->km = km;
     addCidade->prox = NULL;
     addCidade->ant = NULL;
 
-    if (cidades->inicio == NULL) {
-        // Lista vazia: o novo nó se torna o primeiro e último
+    if(cidades->inicio == NULL) {
         cidades->inicio = addCidade;
         cidades->final = addCidade;
-    } else {
-        NoCidades *aux = cidades->inicio;
+    }
+    else {
+        novaCidade aux = cidades->inicio;
 
-        // Encontrar a posição correta com base na quilometragem (ordem crescente)
-        while (aux != NULL && km >= aux->km) {
+        while(aux != NULL && km >= aux->km) {
             aux = aux->prox;
         }
 
-        if (aux == NULL) {
-            // Inserir no final
-            addCidade->ant = cidades->final;
-            cidades->final->prox = addCidade;
-            cidades->final = addCidade;
-        } else if (aux->ant == NULL) {
-            // Inserir no início
-            addCidade->prox = cidades->inicio;
-            cidades->inicio->ant = addCidade;
-            cidades->inicio = addCidade;
-        } else {
-            // Inserir no meio
-            addCidade->prox = aux;
-            addCidade->ant = aux->ant;
+        addCidade->prox = aux;
+        if (aux->ant != NULL) {
             aux->ant->prox = addCidade;
-            aux->ant = addCidade;
+        }
+
+        addCidade->ant = aux->ant;
+        aux->ant = addCidade;
+
+        if(aux == NULL) {
+            cidades->final = addCidade;
+        }
+        else if(aux->ant == NULL) {
+            cidades->inicio = addCidade;
         }
     }
 
@@ -150,7 +153,7 @@ void adicionarCidade(descritorCidades *cidades, char *cidade, char *estado, floa
 descritorCidades *verificadorRodovia(descritorRodovias *descritor, char *rodovia) {
     novaRodovia aux = descritor->inicio;
     while(aux != NULL) {
-        if(strcmp(aux->rodovia, rodovia) == 0) {
+        if(strcmp(stringToUpr(aux->rodovia), stringToUpr(rodovia)) == 0) {
             return &(aux->cidades);
         }
         aux = aux->prox;
@@ -167,6 +170,10 @@ void adicionarRodovia(descritorRodovias *descritor, char *rodovia, char *cidade,
         return;
     }
 
+    novaRodovia aux = descritor->inicio;
+    while(aux != NULL) {
+
+    }
     novaRodovia nova;
     nova = (NoRodovias *)malloc(sizeof(NoRodovias));
     if(nova == NULL) {
@@ -200,7 +207,7 @@ void adicionarRodovia(descritorRodovias *descritor, char *rodovia, char *cidade,
 // Função para ler dados de um arquivo e preencher a lista de rodovias e cidades
 void carregarDados(descritorRodovias *descritor) {
     FILE *ptrArquivo;
-    char rodovia[9], cidade[22], estado[3], linha[100];
+    char rodovia[9], cidade[21], estado[3];
     float km;
 
     ptrArquivo = fopen("rodovias.txt", "r");
@@ -208,24 +215,19 @@ void carregarDados(descritorRodovias *descritor) {
         printf("Erro ao abrir o arquivo!\n");
         return;
     }
+    else {
 
-    while (fgets(linha, sizeof(linha), ptrArquivo) != NULL) {
-        sscanf(linha, "%21[^\n]", cidade); // Read city
-        fgets(linha, sizeof(linha), ptrArquivo);
-        sscanf(linha, "%2[^\n]", estado); // Read state
-        fgets(linha, sizeof(linha), ptrArquivo);
-        sscanf(linha, "%8[^\n]", rodovia); // Read highway
-        fgets(linha, sizeof(linha), ptrArquivo);
-        sscanf(linha, "%f", &km); // Read distance
+        while(fscanf(ptrArquivo, "%20s", cidade) != EOF) {
+            fscanf(ptrArquivo, "%2s", estado);
+            fscanf(ptrArquivo, "%8s", rodovia);
+            fscanf(ptrArquivo, "%f", &km);
+            printf("passei aqui");
 
-        to_lowercase(rodovia);
-        to_lowercase(cidade);
-        to_lowercase(estado);
+            adicionarRodovia(descritor, rodovia, cidade, estado, km);
+        }
 
-        adicionarRodovia(descritor, rodovia, cidade, estado, km);
+        fclose(ptrArquivo);
     }
-
-    fclose(ptrArquivo);
 }
 
 
@@ -321,6 +323,19 @@ int removerCidade(descritorRodovias *descritor, char *cidade){
     return 1;
 }
 
+void to_lowercase(char *str) {
+    if (str == NULL) return;
+    int i = 0;
+    while (str[i]) {
+
+        if (str[i] >= 'A' && str[i] <= 'Z') {
+            str[i] = str[i] + 32;
+        }
+        i++;
+    }
+}
+
+
 void rota(char *cidade1, char *cidade2, descritorRodovias *city) {
     if (city == NULL) {
         printf("Descritor das rodovias não iniciado\n");
@@ -330,8 +345,8 @@ void rota(char *cidade1, char *cidade2, descritorRodovias *city) {
     NoRodovias *marcadorR = city->inicio;
     NoCidades *marcadorC;
     NoCidades *inicio;
-    to_lowercase(cidade1);
-    to_lowercase(cidade2);
+    cidade1 = stringToUpr(cidade1);
+    cidade2 = stringToUpr(cidade2);
 
     for (int x = 0; x < city->quantRodovias; x++) {
         marcadorC = marcadorR->cidades.inicio;
@@ -373,7 +388,6 @@ void rota(char *cidade1, char *cidade2, descritorRodovias *city) {
 
     printf("Percurso não encontrado entre %s e %s.\n", cidade1, cidade2);
 }
-
 
 int cruzamento(char *rodovia1, char *rodovia2, char *cidade, descritorRodovias *city) {
     if (city == NULL) {
@@ -424,64 +438,43 @@ int cruzamento(char *rodovia1, char *rodovia2, char *cidade, descritorRodovias *
     return 0;
 }
 
-void imprimirRodoviasPorCidade(descritorRodovias *descritor) {
-    NoRodovias *aux = descritor->inicio;
-
-    while(aux != NULL) {
-        NoCidades *aux2 = aux->cidades.inicio;
-        printf("Rodovia: %s\n", aux->rodovia);
-        while(aux2 != NULL) {
-            printf("Cidade: %s\n", aux2->cidade);
-            printf("Estado: %s\n", aux2->estado);
-            printf("KM: %.2f\n\n", aux2->km);
-            aux2 = aux2->prox;
-        }
-        aux = aux->prox;
-    }
-}
-
-void menu(descritorRodovias *rodovias) {
-    while (1) {
+ void menu(descritorRodovias *rodovias) {
+    while(1) {
         int escolha;
         char nomeRodovia[10], nomeCidade[20];
 
         printf("\nEscolha a opção desejada:\n");
-        printf("1 - Adicionar Rodovia\n");
-        printf("2 - Remover Cidade\n");
-        printf("3 - Remover Rodovia\n");
-        printf("4 - Traçar Percurso\n");
-        printf("5 - Cruzamento entre rodovias\n");
-        printf("0 - Sair\n");
-        printf("Opção: ");
+        printf("\n1 - Adicionar Rodovia\n");
+        printf("\n2 - Remover Cidade\n");
+        printf("\n3 - Remover Rodovia\n");
+        printf("\n4 - Traçar Percurso\n");
+        printf("\n5 - Cruzamento entre rodovias\n");
+        printf("\n0 - Sair\n");
         scanf("%d", &escolha);
-        getchar(); // Limpa o buffer de nova linha deixado por scanf()
 
-        switch (escolha) {
-            case 1: {
-                char estado[3]; // Ajuste para comportar string de 2 caracteres + '\0'
+        switch(escolha){
+            case 1:
+                char estado[2];
                 float km;
 
                 printf("\nInsira:\n");
-                printf("Nome da Cidade: ");
-                fgets(nomeCidade, sizeof(nomeCidade), stdin);
-                nomeCidade[strcspn(nomeCidade, "\n")] = '\0'; // Remove nova linha
-                printf("Estado (Sigla): ");
-                scanf("%2s", estado); // Limita leitura a 2 caracteres
-                getchar(); // Limpa o buffer de nova linha
-                printf("Nome da Rodovia: ");
+                printf("\nNome da Cidade: ");
+                fgets(nomeCidade, 19, stdin);
+                nomeCidade[strcspn(nomeCidade, "\n")] = '\0';
+                printf("\nEstado (Sigla): ");
+                scanf("%s", estado);
+                printf("\nNome da Rodovia: ");
                 scanf("%s", nomeRodovia);
-                getchar(); // Limpa o buffer de nova linha
-                printf("Quilometragem: ");
+                printf("\nQuilometragem: ");
                 scanf("%f", &km);
-                getchar(); // Limpa o buffer de nova linha
 
                 adicionarRodovia(rodovias, nomeRodovia, nomeCidade, estado, km);
                 break;
-            }
+
             case 2:
                 printf("\nQual cidade você deseja remover?\n");
-                fgets(nomeCidade, sizeof(nomeCidade), stdin);
-                nomeCidade[strcspn(nomeCidade, "\n")] = '\0'; // Remove nova linha
+                fgets(nomeCidade, 19, stdin);
+                nomeCidade[strcspn(nomeCidade, "\n")] = '\0';
 
                 removerCidade(rodovias, nomeCidade);
                 break;
@@ -489,62 +482,61 @@ void menu(descritorRodovias *rodovias) {
             case 3:
                 printf("\nQual rodovia você deseja remover?\n");
                 scanf("%s", nomeRodovia);
-                getchar(); // Limpa o buffer de nova linha
 
                 removerRodovia(rodovias, nomeRodovia);
                 break;
 
-            case 4: {
+            case 4:
                 char cidade1[30], cidade2[30];
+                getchar();
                 printf("\nQual rota você deseja fazer?\n");
-                printf("Nome da cidade em que você começará a rota: ");
-                fgets(cidade1, sizeof(cidade1), stdin);
-                cidade1[strcspn(cidade1, "\n")] = '\0'; // Remove nova linha
-                printf("Nome da cidade em que você quer chegar: ");
-                fgets(cidade2, sizeof(cidade2), stdin);
-                cidade2[strcspn(cidade2, "\n")] = '\0'; // Remove nova linha
+                printf("\nNome da cidade em que você começará a rota: ");
+                fgets(cidade1, 29, stdin);
+                cidade1[strcspn(cidade1, "\n")] = '\0';
+                printf("\nNome da cidade em que você quer chegar: ");
+                fgets(cidade2, 29, stdin);
+                cidade2[strcspn(cidade2, "\n")] = '\0';
+
 
                 rota(cidade1, cidade2, rodovias);
                 break;
-            }
-            case 5: {
+
+            case 5:
                 char rodovia1[30], rodovia2[30], cidade[20];
-
-                printf("\nDigite o nome da primeira rodovia: ");
-                scanf("%s", rodovia1);
-                getchar(); // Limpa o buffer de nova linha
-                printf("Digite o nome da segunda rodovia: ");
-                scanf("%s", rodovia2);
-                getchar(); // Limpa o buffer de nova linha
-
-                if (cruzamento(rodovia1, rodovia2, cidade, rodovias) == 1) {
-                    printf("\nAs rodovias se cruzam na cidade %s\n", cidade);
-                } else {
-                    printf("\nAs rodovias não se cruzam.\n");
+                
+                if(cruzamento(rodovia1, rodovia2, cidade, rodovias) == 1){
+                    printf("\nAs rodovias se cruzam na cidade %s", cidade);
                 }
-                break;
-            }
-            case 6:
-                imprimirRodoviasPorCidade(rodovias);
+                else{
+                    printf("\nAs rodovias não se cruzam na cidade %s", cidade);
+                }
                 break;
             case 0:
                 printf("\nFinalizando...\n");
                 return;
-
-            default:
-                printf("\nOpção inválida. Tente novamente.\n");
         }
     }
-}
+ }
 
+void imprimirRodovias(descritorRodovias *descritor) {
+    NoRodovias *aux = descritor->inicio;
+
+    while(aux != NULL) {
+        NoCidades *aux2 = aux->cidades.inicio;
+
+        while(aux2 != NULL) {
+            printf("%s\n%s\n%s\n%.2f\n", aux2->cidade, aux2->estado, aux->rodovia, aux2->km);
+            aux2 = aux2->prox;
+        }
+        aux = aux->prox;
+    }
+}
 
 int main(void) {
     descritorRodovias *rodovias;
     rodovias = iniciarRodovias();
 
     carregarDados(rodovias);
-
-    imprimirRodoviasPorCidade(rodovias);
 
     menu(rodovias);
 
