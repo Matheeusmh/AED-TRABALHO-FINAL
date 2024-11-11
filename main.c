@@ -161,6 +161,10 @@ descritorCidades *verificadorRodovia(descritorRodovias *descritor, char *rodovia
 
 // Função para adicionar uma rodovia e associar uma cidade a ela
 void adicionarRodovia(descritorRodovias *descritor, char *rodovia, char *cidade, char *estado, float km) {
+    to_lowercase(rodovia);
+    to_lowercase(cidade);
+    to_lowercase(estado);
+    
     descritorCidades *verificaRodovia = verificadorRodovia(descritor, rodovia);
     if(verificaRodovia != NULL) {
         adicionarCidade(verificaRodovia, cidade, estado, km);
@@ -217,10 +221,6 @@ void carregarDados(descritorRodovias *descritor) {
         sscanf(linha, "%8[^\n]", rodovia); // Read highway
         fgets(linha, sizeof(linha), ptrArquivo);
         sscanf(linha, "%f", &km); // Read distance
-
-        to_lowercase(rodovia);
-        to_lowercase(cidade);
-        to_lowercase(estado);
 
         adicionarRodovia(descritor, rodovia, cidade, estado, km);
     }
