@@ -164,7 +164,7 @@ void adicionarRodovia(descritorRodovias *descritor, char *rodovia, char *cidade,
     to_lowercase(rodovia);
     to_lowercase(cidade);
     to_lowercase(estado);
-    
+
     descritorCidades *verificaRodovia = verificadorRodovia(descritor, rodovia);
     if(verificaRodovia != NULL) {
         adicionarCidade(verificaRodovia, cidade, estado, km);
@@ -321,108 +321,153 @@ int removerCidade(descritorRodovias *descritor, char *cidade){
     return 1;
 }
 
+// Função que encontra o percurso entre duas cidades, cidade1 e cidade2
 void rota(char *cidade1, char *cidade2, descritorRodovias *city) {
+    // Verifica se o descritor das rodovias foi iniciado corretamente
     if (city == NULL) {
         printf("Descritor das rodovias não iniciado\n");
         return;
     }
 
+    // Inicializa o ponteiro marcadorR para o início da lista de rodovias
     NoRodovias *marcadorR = city->inicio;
-    NoCidades *marcadorC;
-    NoCidades *inicio;
+    NoCidades *marcadorC;   // Ponteiro para percorrer as cidades dentro das rodovias
+    NoCidades *inicio;      // Ponteiro para armazenar a cidade de início (cidade1)
+
+    // Converte as cidades para minúsculas
     to_lowercase(cidade1);
     to_lowercase(cidade2);
 
+    // Loop através das rodovias (cada rodovia em 'city')
     for (int x = 0; x < city->quantRodovias; x++) {
+        // Inicializa o ponteiro marcadorC para o início da lista de cidades da rodovia atual
         marcadorC = marcadorR->cidades.inicio;
-        int cont = 0, verificador = 0;
-        inicio = NULL;
 
+        // Variáveis de controle para verificar se as duas cidades estão na mesma rodovia
+        int cont = 0;       // Contador para verificar se ambas as cidades foram encontradas
+        int verificador = 0; // Controla a direção do percurso (se é para frente ou para trás)
+        inicio = NULL;      // Ponteiro para armazenar a cidade de início (cidade1)
+
+        // Loop através das cidades da rodovia atual
         while (marcadorC != NULL) {
+            // Verifica se a cidade1 é a cidade atual
             if (strcmp(cidade1, marcadorC->cidade) == 0) {
                 if (cont == 0) {
-                    verificador = 1;
+                    verificador = 1; // Se for a primeira vez que encontra cidade1, seta o verificador
                 }
-                inicio = marcadorC;
-                cont++;
+                inicio = marcadorC; // Armazena a cidade de início
+                cont++;  // Incrementa o contador
             }
 
+            // Verifica se a cidade2 é a cidade atual
             if (strcmp(cidade2, marcadorC->cidade) == 0) {
-                cont++;
+                cont++; // Incrementa o contador se cidade2 for encontrada
             }
+
+            // Avança para a próxima cidade na rodovia
             marcadorC = marcadorC->prox;
         }
 
+        // Se ambas as cidades foram encontradas na rodovia, e a cidade de início é válida
         if (cont == 2 && inicio != NULL) {
+            // Imprime informações sobre a rodovia e o quilômetro de início
             printf("O percurso começa em %s, pela rodovia %s no km %.2f, passando por:\n",
                    cidade1, marcadorR->rodovia, inicio->km);
 
+            // Inicializa marcadorC para começar na cidade de início
             marcadorC = inicio;
+
+            // Loop para exibir as cidades no percurso
             while (marcadorC != NULL) {
+                // Imprime o nome da cidade, estado e o quilômetro da cidade
                 printf("Cidade: %s (%s), Km: %.2f\n", marcadorC->cidade, marcadorC->estado, marcadorC->km);
+
+                // Se encontrar cidade2, termina o percurso
                 if (strcmp(cidade2, marcadorC->cidade) == 0) {
                     break;
                 }
+
+                // Se 'verificador' for 1, avança para a próxima cidade, senão vai para a cidade anterior
                 marcadorC = (verificador == 1) ? marcadorC->prox : marcadorC->ant;
             }
-            return; // Caminho encontrado, saída da função
+            return; // Se o percurso foi encontrado, sai da função
         }
 
-        marcadorR = marcadorR->prox; // Move para a próxima rodovia
+        // Avança para a próxima rodovia se o percurso não foi encontrado na rodovia atual
+        marcadorR = marcadorR->prox;
     }
 
+    // Se o percurso não for encontrado após percorrer todas as rodovias
     printf("Percurso não encontrado entre %s e %s.\n", cidade1, cidade2);
 }
 
 
+
+// Função que verifica se uma cidade está presente em duas rodovias distintas.
 int cruzamento(char *rodovia1, char *rodovia2, char *cidade, descritorRodovias *city) {
+    // Verifica se o descritor das rodovias foi inicializado corretamente
     if (city == NULL) {
         printf("Descritor das rodovias não iniciado\n");
         return 0;
     }
 
+    // Inicializa o ponteiro marcadorR para o início da lista de rodovias
     NoRodovias *marcadorR = city->inicio;
-    NoCidades *marcadorC1 = NULL;
-    NoCidades *marcadorC2 = NULL;
 
+    // Inicializa os ponteiros das cidades nas rodovias
+    NoCidades *marcadorC1 = NULL;  // Ponteiro para percorrer as cidades da rodovia1
+    NoCidades *marcadorC2 = NULL;  // Ponteiro para percorrer as cidades da rodovia2
+
+    // Loop através das rodovias para encontrar as rodovias passadas como parâmetro
     while (marcadorR != NULL) {
+        // Se a rodovia encontrada for a rodovia1, inicializa marcadorC1
         if (strcmp(marcadorR->rodovia, rodovia1) == 0) {
             marcadorC1 = marcadorR->cidades.inicio;
         }
+        // Se a rodovia encontrada for a rodovia2, inicializa marcadorC2
         if (strcmp(marcadorR->rodovia, rodovia2) == 0) {
             marcadorC2 = marcadorR->cidades.inicio;
         }
-        marcadorR = marcadorR->prox;
+        marcadorR = marcadorR->prox; // Avança para a próxima rodovia
     }
 
+    // Verifica se alguma das rodovias não foi encontrada
     if (marcadorC1 == NULL || marcadorC2 == NULL) {
         printf("Uma ou ambas as rodovias não foram encontradas\n");
         return 0;
     }
 
+    // Verificador para rodovia1: busca a cidade na lista de cidades de rodovia1
     int verificador1 = 0;
     while (marcadorC1 != NULL) {
+        // Verifica se a cidade está na lista de cidades de rodovia1
         if (strcmp(marcadorC1->cidade, cidade) == 0) {
             verificador1 = 1;
             break;
         }
-        marcadorC1 = marcadorC1->prox;
+        marcadorC1 = marcadorC1->prox;  // Avança para a próxima cidade na rodovia1
     }
 
+    // Verificador para rodovia2: busca a cidade na lista de cidades de rodovia2
     int verificador2 = 0;
     while (marcadorC2 != NULL) {
+        // Verifica se a cidade está na lista de cidades de rodovia2
         if (strcmp(marcadorC2->cidade, cidade) == 0) {
             verificador2 = 1;
             break;
         }
-        marcadorC2 = marcadorC2->prox;
+        marcadorC2 = marcadorC2->prox;  
     }
 
+    // Se a cidade foi encontrada em ambas as rodovias, retorna 1
     if (verificador1 && verificador2) {
-        return 1;
+        return 1;  // Ambas as rodovias têm a cidade
     }
+
+    // Se a cidade não foi encontrada em ambas as rodovias, retorna 0 (não há cruzamento)
     return 0;
 }
+
 
 void imprimirRodoviasPorCidade(descritorRodovias *descritor) {
     NoRodovias *aux = descritor->inicio;
@@ -509,7 +554,7 @@ void menu(descritorRodovias *rodovias) {
                 break;
             }
             case 5: {
-                char rodovia1[30], rodovia2[30], cidade[20];
+                char rodovia1[30], rodovia2[30], cidade[30];
 
                 printf("\nDigite o nome da primeira rodovia: ");
                 scanf("%s", rodovia1);
@@ -517,6 +562,10 @@ void menu(descritorRodovias *rodovias) {
                 printf("Digite o nome da segunda rodovia: ");
                 scanf("%s", rodovia2);
                 getchar(); // Limpa o buffer de nova linha
+                printf("Digite o nome da cidade: ");
+                scanf("%s", cidade);
+                getchar(); // Limpa o buffer de nova linha
+
 
                 if (cruzamento(rodovia1, rodovia2, cidade, rodovias) == 1) {
                     printf("\nAs rodovias se cruzam na cidade %s\n", cidade);
