@@ -405,6 +405,10 @@ void rota(char *cidade1, char *cidade2, descritorRodovias *city) {
 
 // Função que verifica se uma cidade está presente em duas rodovias distintas.
 int cruzamento(char *rodovia1, char *rodovia2, char *cidade, descritorRodovias *city) {
+    to_lowercase(rodovia1);
+    to_lowercase(rodovia2);
+    to_lowercase(cidade);
+    
     // Verifica se o descritor das rodovias foi inicializado corretamente
     if (city == NULL) {
         printf("Descritor das rodovias não iniciado\n");
