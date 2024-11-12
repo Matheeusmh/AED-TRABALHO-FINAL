@@ -4,7 +4,6 @@
 #include <ctype.h>
 #include "rodovias.h"
 
-// Função principal
 int main(void) {
     descritorRodovias *rodovias;
     rodovias = iniciarRodovias();
