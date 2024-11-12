@@ -63,6 +63,7 @@ int verificadorCidade(descritorCidades *cidades, char *cidade) {
 // Função para adicionar uma cidade na lista, ordenando pela distância em km
 void adicionarCidade(descritorCidades *cidades, char *cidade, char *estado, float km) {
     if (verificadorCidade(cidades, cidade)) {
+        printf("\n%s ja esta na lista!!\n", cidade);
         return; // Se a cidade já existir, não faz nada.
     }
 
@@ -111,6 +112,8 @@ void adicionarCidade(descritorCidades *cidades, char *cidade, char *estado, floa
     }
 
     cidades->quantCidades++;
+
+    printf("\nCidade %s adicionada com sucesso!\n", cidade);
 }
 
 // Função que verifica se uma rodovia existe, retornando a lista de cidades associada
@@ -477,7 +480,7 @@ void menu(descritorRodovias *rodovias) {
         char nomeRodovia[10], nomeCidade[20];
 
         printf("\nEscolha a opção desejada:\n");
-        printf("1 - Adicionar Rodovia\n");
+        printf("1 - Adicionar cidade/rodovia \n");
         printf("2 - Remover Cidade\n");
         printf("3 - Remover Rodovia\n");
         printf("4 - Traçar Percurso\n");
@@ -508,6 +511,7 @@ void menu(descritorRodovias *rodovias) {
                 getchar(); // Limpa o buffer de nova linha
 
                 adicionarRodovia(rodovias, nomeRodovia, nomeCidade, estado, km);
+                
                 break;
             }
             case 2:
