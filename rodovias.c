@@ -202,6 +202,9 @@ int removerRodovia(descritorRodovias *descritor, char *rodovia){
         return 0;
     }
 
+    // Converte as rodovias para minúsculas
+    to_lowercase(rodovia);
+
     novaRodovia aux = descritor->inicio; // Ponteiro auxiliar que armazena a primeira rodovia e percorre a lista de rodovias.
     novaRodovia ant = NULL; // Ponteiro para armazenar o dado anterior a fim de melhor entendimento.
 
@@ -251,6 +254,9 @@ int removerCidade(descritorRodovias *descritor, char *cidade){
         printf("\nErro! Não há rodovias!\n");
         return 0;
     }
+
+    // Converte as rodovias e as cidades para minúsculas
+    to_lowercase(cidade);
 
     int achou = 0; // Variável auxiliar para saber se a cidade está ou não na lista.
 
