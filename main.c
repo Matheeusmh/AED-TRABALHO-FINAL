@@ -2,10 +2,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include "rodovias.h"
 
 // Definição da estrutura que representa uma cidade
 typedef struct noCidades {
-    char cidade[22]; // Nome da cidade
+    char cidade[100]; // Nome da cidade
     char estado[3]; // Sigla do estado
     float km; // Distância em km
     struct noCidades *prox; // Ponteiro para a próxima cidade
@@ -164,7 +165,7 @@ void adicionarRodovia(descritorRodovias *descritor, char *rodovia, char *cidade,
     to_lowercase(rodovia);
     to_lowercase(cidade);
     to_lowercase(estado);
-    
+
     descritorCidades *verificaRodovia = verificadorRodovia(descritor, rodovia);
     if(verificaRodovia != NULL) {
         adicionarCidade(verificaRodovia, cidade, estado, km);
@@ -204,7 +205,7 @@ void adicionarRodovia(descritorRodovias *descritor, char *rodovia, char *cidade,
 // Função para ler dados de um arquivo e preencher a lista de rodovias e cidades
 void carregarDados(descritorRodovias *descritor) {
     FILE *ptrArquivo;
-    char rodovia[9], cidade[22], estado[3], linha[100];
+    char rodovia[9], cidade[100], estado[3], linha[101];
     float km;
 
     ptrArquivo = fopen("rodovias.txt", "r");
@@ -214,13 +215,13 @@ void carregarDados(descritorRodovias *descritor) {
     }
 
     while (fgets(linha, sizeof(linha), ptrArquivo) != NULL) {
-        sscanf(linha, "%21[^\n]", cidade); // Read city
+        sscanf(linha, "%101[^\n]", cidade); // Ler cidade
         fgets(linha, sizeof(linha), ptrArquivo);
-        sscanf(linha, "%2[^\n]", estado); // Read state
+        sscanf(linha, "%2[^\n]", estado); // Ler estado
         fgets(linha, sizeof(linha), ptrArquivo);
-        sscanf(linha, "%8[^\n]", rodovia); // Read highway
+        sscanf(linha, "%8[^\n]", rodovia); // Ler rodovia
         fgets(linha, sizeof(linha), ptrArquivo);
-        sscanf(linha, "%f", &km); // Read distance
+        sscanf(linha, "%f", &km); // Ler o km
 
         adicionarRodovia(descritor, rodovia, cidade, estado, km);
     }
@@ -477,6 +478,7 @@ void menu(descritorRodovias *rodovias) {
                 getchar(); // Limpa o buffer de nova linha
 
                 adicionarRodovia(rodovias, nomeRodovia, nomeCidade, estado, km);
+                
                 break;
             }
             case 2:
@@ -544,8 +546,6 @@ int main(void) {
     rodovias = iniciarRodovias();
 
     carregarDados(rodovias);
-
-    imprimirRodoviasPorCidade(rodovias);
 
     menu(rodovias);
 
